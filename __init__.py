@@ -1,45 +1,44 @@
 import bpy
-from .pypresence import pypresence as rpc
 from bpy.app.handlers import persistent
+from .pypresence import pypresence as rpc
 
 from . import preferences
 
 from datetime import datetime, timedelta
 
 bl_info = {
-    "name": "Blender Discord RPC",
-    "description": "Fully featured Discord Rich Presence for Discord",
+    "name": "Blender Rich Presence Plus",
+    "description": "Fully customizable Discord Rich Presence for Blender",
     "author": "Haggets",
     "version": (1, 0, 0),
     "blender": (2, 80, 0),
-    "tracker_url": "https://github.com/Haggets/blender-discord-rpc",
+    "tracker_url": "https://github.com/Haggets/blender-rich-presence-plus",
+    "tracker_url": "https://github.com/Haggets/blender-rich-presence-plus/issues",
     "category": "System",
 }
 
-classes = [preferences.BlenderRPCPreferences]
-
 def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    bpy.utils.register_class(preferences.RichPresencePreferences)
+
+    RPC.connect() # Start the handshake loop
 
     bpy.app.timers.register(update_presence, first_interval=1.0, persistent=True)
     bpy.app.handlers.render_init.append(start_render)
     bpy.app.handlers.render_complete.append(stop_render)
     bpy.app.handlers.render_cancel.append(stop_render)
     bpy.app.handlers.render_post.append(during_render)
-    RPC.connect() # Start the handshake loop
-
 
 def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+    bpy.utils.unregister_class(preferences.RichPresencePreferences)
+
+    RPC.clear() #Clears the Rich Presence before closing
+    RPC.close()
 
     bpy.app.timers.unregister(update_presence)
     bpy.app.handlers.render_init.remove(start_render)
     bpy.app.handlers.render_complete.remove(stop_render)
     bpy.app.handlers.render_cancel.remove(stop_render)
     bpy.app.handlers.render_post.remove(during_render)
-    RPC.close()
 
 #Bot ID
 client_id = '823368505465896960'
@@ -57,15 +56,21 @@ small_image = ''
 small_text = ''
 
 #Other variables
-rendering = False
-renderend = 0
-paststartframe = False
+class Global():
+    rendering = False
+    renderstart = 0
+    renderend = 0
+    paststartframe = False
+    endframe = 0
 
-rendertime = 0
-rendertime2 = 0
-estimated1 = 0
-estimated2 = 0
-reference = True
+    referencetime = 0
+    postreferencetime = 0
+    estimated1 = 0
+    estimated2 = 0
+    reference = False
+
+if __name__ == "__main__":
+    register()
 
 def get_version(): #Gets currently used version of Blender
     pref = bpy.context.preferences.addons[__name__].preferences
@@ -304,16 +309,22 @@ def get_workspace(): #Gets workspace user is currently in
                 pass
             else:
                 workspace = None
-        
-        return workspace
-
+    
         #Adds a suffix to the workspace to indicate that the user is rendering along with working
-        if rendering:
+        if Global.rendering:
             engine = bpy.context.engine
             if engine.startswith('BLENDER_'): #Small fixup since Eevee is called "Blender_Eevee" internally
                 engine = engine.replace('BLENDER_', '').title()
+            else:
+                engine = engine.title()
 
-            if workspace != "Rendering":
+            if workspace == None:
+                if pref.display_render_engine:
+                    workspace = "Rendering in {}".format(engine)
+                else:
+                    workspace = "Rendering"
+
+            elif workspace != "Rendering":
                 if pref.display_render_engine:
                     workspace = workspace + " (Rendering in {})".format(engine)
                 else:
@@ -323,6 +334,8 @@ def get_workspace(): #Gets workspace user is currently in
                     workspace = workspace + " in {}".format(engine)
                 else:
                     pass
+
+        return workspace
 
     elif pref.display_workspace == 'OP2' and len(pref.workspace_custom_text) >= 1:
         workspace = pref.workspace_custom_text
@@ -344,73 +357,63 @@ def get_start(*args):
 
     return time
 
+@persistent
 def start_render(*args):
-    global rendering
-    global renderstart
-    global paststartframe
-    rendering = True
-    paststartframe = False
-    renderstart = datetime.now()
+    Global.rendering = True
+    Global.paststartframe = False
+    Global.renderstart = datetime.now()
 
-def during_render(*args):
-    global renderend
-    global renderstart
-    global rendertime
-    global rendertime2
-    global paststartframe
-    global estimated1
-    global estimated2
-    global reference
-    
+@persistent
+def during_render(*args):    
     pref = bpy.context.preferences.addons[__name__].preferences
 
+    #Get total frame count
     endframe = bpy.context.scene.frame_end
+
+    #If disabled, the time left will not be shown
     if pref.display_render_time:
-        paststartframe = True
+        Global.paststartframe = True
     
-    if not rendertime and reference:
-        rendertime = datetime.now() #Reference frame after start frame
-        #print('rendertime1:', rendertime)
-    elif not rendertime2 and not reference:
-        rendertime2 = datetime.now() #Frame after reference frame
-        reference = True
-        #print('rendertime2:', rendertime2)
+    #If there is no reference time and the current frame is a reference frame
+    if Global.reference:
+        Global.referencetime = datetime.now() #Get time after end of reference frame
 
-    if not renderend: #Means first frame, get estimate based on first frame
-        estimated1 = rendertime - renderstart #Gets rendered time from subtracting first frame time spent by initial render time
-        renderend = estimated1 * endframe #Multiplies rendered time by amount of frames
-        renderend = renderstart + renderend #Sums the estimated time to the initial render time
-    else: #After first frame, averages frame values 
-        if reference:
-            estimated1 = rendertime2 - rendertime
-        else:
-            estimated2 = rendertime2 - rendertime #Gets rendered time from subtracting frame time spent by prior frame time spent
-            estimated1 = (estimated1+estimated2)/2
-            renderend = estimated1 * endframe
+    #If there is no post reference time and the current frame is not a reference frame
+    elif not Global.reference:
+        Global.postreferencetime = datetime.now() #Time taken to render relative to the reference frame
 
-            renderend = renderstart + renderend
+    #Only on the first frame, gets rough time estimate
+    if not Global.renderend:
+        Global.estimated1 = Global.postreferencetime - Global.renderstart #Gets render time from subtracting first frame time spent by initial render time
+        Global.renderend = Global.estimated1 * endframe #Multiplies rendered time by total amount of frames
+        Global.renderend = Global.renderstart + Global.renderend #Sums the estimated time to the initial render time
+    else: #After first frame
+        if not Global.reference:
+            Global.estimated2 = Global.postreferencetime - Global.referencetime #Gets rendered time from subtracting current frame time spent by reference frame time
+            Global.estimated1 = (Global.estimated1+Global.estimated2)/2 #Sums both estimates and then divides them, averaging out the estimate
+            Global.renderend = Global.estimated1 * endframe #Multiplies averaged estimate by total amount of frames
+
+            Global.renderend = Global.renderstart + Global.renderend #Sums averaged estimated time to the intial render time
         
-    if reference:
-        reference = False
-    elif not reference:
-        reference = True
+    if Global.reference:
+        Global.reference = False
+    elif not Global.reference:
+        Global.reference = True
         
-    #print(estimated1)
-    #print(estimated2)
-    #print('render:', renderend)
+    #print(Global.renderstart, Global.renderend)
+    #print(Global.estimated1)
+    #print(Global.estimated2)
+    #print('render:', Global.renderend)
 
+@persistent
 def stop_render(*args):
-    global rendering
-    global paststartframe
-    global renderend
-    rendering = False
-    paststartframe = False
-    renderend = 0
+    Global.rendering = False
+    Global.paststartframe = False
+
+    Global.reference = False
+    Global.renderend = 0
 
 def update_presence():
-    global rendering
-    global paststartframe
-
     large_text = get_version()
     details = get_blendfile()
     small_text, small_image = get_state()
@@ -421,16 +424,13 @@ def update_presence():
     RPC.update(
         state=state,
         details=details,
-        start=start if not rendering else renderstart.timestamp(),
-        end=None if not paststartframe else renderend.timestamp(),
+        start=start if not Global.rendering else Global.renderstart.timestamp(),
+        end=None if not Global.paststartframe else Global.renderend.timestamp(),
         large_image=large_image,
         large_text=large_text,
         small_image=small_image,
         small_text=small_text
         )
 
-    print('Updated')
+    #print('Updated')
     return 15
-
-if __name__ == "__main__":
-    register()
