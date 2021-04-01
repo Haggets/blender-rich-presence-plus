@@ -1,3 +1,5 @@
+[![discord](https://img.shields.io/discord/693987167210438656.svg?style=for-the-badge&label=Discord&logo=discord&color=7289DA&json?)](https://discord.gg/kH99XSU) [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
+
 # Blender Discord Rich Presence
 Another Blender Rich Presence plugin that unlike the rest, gives you total control in terms of customization, being able to freely modify what to show, and when to show it
 
