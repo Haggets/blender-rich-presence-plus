@@ -89,11 +89,11 @@ def get_version(): #Gets currently used version of Blender
 def get_blendfile(): #Gets file name or full file path the user is currently on
     pref = bpy.context.preferences.addons[__name__].preferences
 
+    blendfile = ''
+
     if pref.display_blendfile == 'OP1' and len(pref.blendfile_custom_text) <= 3:
         if bpy.data.filepath:
-            blendfile = bpy.path.display_name(bpy.data.filepath) + '.blend'
-        else:
-            blendfile = ''
+            blendfile = bpy.path.display_name(bpy.data.filepath) + '.blend'            
 
     elif pref.display_blendfile == 'OP2':
         blendfile = bpy.data.filepath
