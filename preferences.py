@@ -1,6 +1,6 @@
 import bpy
 
-class BlenderRPCPreferences(bpy.types.AddonPreferences):
+class RichPresencePreferences(bpy.types.AddonPreferences):
     """Blender Rich Presence preferences"""
 
     bl_idname = __package__
@@ -230,7 +230,7 @@ class BlenderRPCPreferences(bpy.types.AddonPreferences):
     )
 
     others_category : bpy.props.BoolProperty(
-        name="Others categories",
+        name="Others category",
         description="Options for other categories that arent's so important",
         default=False
     )
