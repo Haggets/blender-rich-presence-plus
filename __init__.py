@@ -1,24 +1,33 @@
 import bpy
-from bpy.app.handlers import persistent
-from .pypresence import pypresence as rpc
+
+#Updater
+from . import addon_updater_ops
+from . import addon_updater
 
 from . import preferences
 
+from bpy.app.handlers import persistent
+from .pypresence import pypresence as rpc
 from datetime import datetime, timedelta
 
 bl_info = {
     "name": "Blender Rich Presence Plus",
-    "description": "Fully customizable Discord Rich Presence for Blender",
     "author": "Haggets",
-    "version": (1, 0, 0),
-    "blender": (2, 80, 0),
-    "tracker_url": "https://github.com/Haggets/blender-rich-presence-plus",
+    "version": (1, 1, 0),
+    "blender": (2, 83, 0),
+    "description": "Fully customizable Discord Rich Presence for Blender",
+    "url": "https://github.com/Haggets/blender-rich-presence-plus",
+    "wiki_url": "https://github.com/Haggets/blender-rich-presence-plus",
     "tracker_url": "https://github.com/Haggets/blender-rich-presence-plus/issues",
     "category": "System",
 }
 
 def register():
-    bpy.utils.register_class(preferences.RichPresencePreferences)
+    
+    #Registers addon updater
+    addon_updater_ops.register(bl_info)
+
+    bpy.utils.register_class(preferences.BRCP_preferences)
 
     RPC.connect() # Start the handshake loop
 
@@ -29,7 +38,10 @@ def register():
     bpy.app.handlers.render_post.append(during_render)
 
 def unregister():
-    bpy.utils.unregister_class(preferences.RichPresencePreferences)
+    
+    addon_updater_ops.unregister()
+
+    bpy.utils.unregister_class(preferences.BRCP_preferences)
 
     RPC.clear() #Clears the Rich Presence before closing
     RPC.close()
