@@ -1,9 +1,43 @@
 import bpy
+from . import addon_updater_ops
 
-class RichPresencePreferences(bpy.types.AddonPreferences):
-    """Blender Rich Presence preferences"""
-
+@addon_updater_ops.make_annotations
+class BRCP_preferences(bpy.types.AddonPreferences):
+    """Blender Rich Presence Plus preferences/updater"""
     bl_idname = __package__
+
+    #Updater preferences
+    auto_check_update : bpy.props.BoolProperty(
+        name="Auto-check for Update",
+        description="If enabled, auto-check for updates using an interval",
+        default=False)
+
+    updater_interval_months : bpy.props.IntProperty(
+        name='Months',
+        description="Number of months between checking for updates",
+        default=0,
+        min=0)
+
+    updater_interval_days : bpy.props.IntProperty(
+        name='Days',
+        description="Number of days between checking for updates",
+        default=7,
+        min=0,
+        max=31)
+
+    updater_interval_hours : bpy.props.IntProperty(
+        name='Hours',
+        description="Number of hours between checking for updates",
+        default=0,
+        min=0,
+        max=23)
+
+    updater_interval_minutes : bpy.props.IntProperty(
+        name='Minutes',
+        description="Number of minutes between checking for updates",
+        default=0,
+        min=0,
+        max=59)
 
     #Version
     version_category : bpy.props.BoolProperty(
@@ -254,6 +288,7 @@ class RichPresencePreferences(bpy.types.AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
+        settings = addon_updater_ops.get_user_preferences(context)
 
         col = layout.row()
         col.prop(self,'version_category', emboss=False, icon='DISCLOSURE_TRI_DOWN' if self.version_category else 'DISCLOSURE_TRI_RIGHT')
@@ -354,3 +389,7 @@ class RichPresencePreferences(bpy.types.AddonPreferences):
                 row = layout.row()
                 row.prop(self, 'display_time')
                 row.prop(self, 'display_render_time')
+
+        col = layout.column()
+
+        addon_updater_ops.update_settings_ui(self, context)
