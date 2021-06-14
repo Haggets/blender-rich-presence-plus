@@ -1,3 +1,4 @@
+from os import replace
 import bpy
 
 #Updater
@@ -9,11 +10,12 @@ from . import preferences
 from bpy.app.handlers import persistent
 from .pypresence import pypresence as rpc
 from datetime import datetime, timedelta
+from os.path import getsize
 
 bl_info = {
     "name": "Blender Rich Presence Plus",
     "author": "Haggets",
-    "version": (1, 1, 0),
+    "version": (1, 2, 0),
     "blender": (2, 83, 0),
     "description": "Fully customizable Discord Rich Presence for Blender",
     "url": "https://github.com/Haggets/blender-rich-presence-plus",
@@ -84,42 +86,219 @@ class Global():
 if __name__ == "__main__":
     register()
 
-def get_version(): #Gets currently used version of Blender
+def change_keystring(variable, key, replacement):
+    if not replacement:
+        if key == '{file_name}':
+            replacement = 'New File'
+        elif key == '{folder_name}':
+            replacement = 'No Folder'
+        elif key == '{full_path}':
+            replacement = 'No Directory'
+        else:
+            replacement = ''
+
+    if variable.count(key):
+        variable = variable.replace(key, replacement)
+    
+    return variable
+
+def change_all_keystrings(variable):
+    variable = change_keystring(variable, '{file_name}', bpy.path.display_name(bpy.data.filepath))
+    variable = change_keystring(variable, '{folder_name}', bpy.data.filepath.split('\\')[len(bpy.data.filepath.split('\\'))-2])
+    variable = change_keystring(variable, '{full_path}', bpy.data.filepath)
+    variable = change_keystring(variable, '{blender_version}', bpy.app.version_string)
+    variable = change_keystring(variable, '{workspace}', get_workspace())
+    variable = change_keystring(variable, '{render_state}', render(variable))
+
+    if bpy.data.filepath:
+        if getsize(bpy.data.filepath)/1000000 < 1:
+            size = str(int(getsize(bpy.data.filepath)/1000)) + 'KB'
+        else:
+            size = str(int(getsize(bpy.data.filepath)/1000000)) + 'MB'
+    
+        variable = change_keystring(variable, '{file_size}', size)
+    else:
+        variable = change_keystring(variable, '{file_size}', 'Unknown File Size')
+
+    return variable
+
+def version(): #Gets currently used version of Blender
     pref = bpy.context.preferences.addons[__name__].preferences
 
-    if pref.display_version == 'OP1' and len(pref.version_custom_text) <= 1:
-        version = 'Version ' + bpy.app.version_string
+    if pref.version_text:
+        version = pref.version_text
 
-    elif pref.display_version == 'OP2' and len(pref.version_custom_text) >= 2:
-        version = pref.version_custom_text
-
-    elif pref.display_version == 'OP3':
+        version = change_all_keystrings(version)
+    else:
         version = None
+
+    if version and len(version) <= 1:
+        version = version + ' '
 
     return version
 
-def get_blendfile(): #Gets file name or full file path the user is currently on
+def blendfile(): #Gets file name or full file path the user is currently on
     pref = bpy.context.preferences.addons[__name__].preferences
 
     blendfile = ''
 
-    if pref.display_blendfile == 'OP1' and len(pref.blendfile_custom_text) <= 3:
-        if bpy.data.filepath:
-            blendfile = bpy.path.display_name(bpy.data.filepath) + '.blend'            
+    if pref.blendfile_text:
+        blendfile = pref.blendfile_text
 
-    elif pref.display_blendfile == 'OP2':
-        blendfile = bpy.data.filepath
+        blendfile = change_all_keystrings(blendfile)
 
-    elif pref.display_blendfile == 'OP3' and len(pref.blendfile_custom_text) >= 4:
-        blendfile = pref.blendfile_custom_text
-        
-    elif pref.display_blendfile == 'OP4':
+        #Removes the .blend when the scene is now, since it looks weird with it
+        if blendfile.count('New File') or blendfile.count('No Folder') or blendfile.count('No Directory'):
+            blendfile = blendfile.replace('.blend', '')
+    else:
         blendfile = None
-    
-    if not blendfile and pref.display_blendfile != 'OP4':
-        blendfile = "New file"
+
+    #Adds filler spaces to allow for the string to be shorter than 3 letters
+    if blendfile and len(blendfile) <= 3:
+        blendfile = blendfile + '   '
 
     return blendfile
+
+def workspace(): #Gets workspace user is currently in
+    pref = bpy.context.preferences.addons[__name__].preferences
+
+    if pref.workspace_text:
+        workspace = pref.workspace_text
+
+        workspace = change_all_keystrings(workspace)
+    else:
+        workspace = None
+
+    if workspace and len(workspace) <= 1:
+        workspace = workspace + ' '
+
+    return workspace
+
+def get_workspace():
+    pref = bpy.context.preferences.addons[__name__].preferences
+
+    workspace = bpy.context.workspace.name
+
+    if workspace == "Layout" or workspace == "Default":
+        if pref.workspace_default or not pref.blacklist_workspaces:
+            workspace = "General work"
+        else:
+            workspace = None
+
+    elif workspace.count("Sculpt"):
+        if pref.workspace_sculpting or not pref.blacklist_workspaces:
+            workspace = "Sculpting"
+        else:
+            workspace = None
+
+    elif workspace.count("UV"):
+        if pref.workspace_uv or not pref.blacklist_workspaces:
+
+            workspace = "UV editing"
+        else:
+            workspace = None
+
+    elif workspace.count("Texture"):
+        if pref.workspace_texture or not pref.blacklist_workspaces:
+            if workspace.count("Paint"):
+                workspace = "Texture painting"
+            else:
+                workspace = "Texture work"
+        else:
+            workspace = None
+    
+    elif workspace.count("Shading"):
+        if pref.workspace_shading or not pref.blacklist_workspaces:
+            workspace = "Shading"
+        else:
+            workspace = None
+
+    elif workspace.count("2D"):
+        if pref.workspace_2d or not pref.blacklist_workspaces:
+            workspace = "2D animating"
+        else:
+            workspace = None
+
+    elif workspace.count("Animation"):
+        if pref.workspace_animation or not pref.blacklist_workspaces:
+            workspace = "Animating"
+        else:
+            workspace = None
+
+    elif workspace.count("Rendering"):
+        if pref.workspace_rendering or not pref.blacklist_workspaces:
+            workspace = "Rendering"
+        else:
+            workspace = None
+
+    elif workspace.count("Compositing"):
+        if pref.workspace_compositing or not pref.blacklist_workspaces:
+            workspace = "Compositing"
+        else:
+            workspace = None
+
+    elif workspace.count("Geometry Nodes"):
+        if pref.workspace_geometry_nodes or not pref.blacklist_workspaces:
+            workspace = "Geometry Nodes Work"
+        else:
+            workspace = None
+
+    elif workspace.count("Scripting"):
+        if pref.workspace_scripting or not pref.blacklist_workspaces:
+            workspace = "Scripting"
+        else:
+            workspace = None
+
+    elif workspace.count("Motion Tracking"):
+        if pref.workspace_motiontracking or not pref.blacklist_workspaces:
+            workspace = "Motion tracking"
+        else:
+            workspace = None
+
+    elif workspace.count("Masking"):
+        if pref.workspace_masking or not pref.blacklist_workspaces:
+            workspace = "Masking"
+        else:
+            workspace = None
+
+    elif workspace.count("Video editing"):
+        if pref.workspace_video or not pref.blacklist_workspaces:
+            workspace = "Video editing"
+        else:
+            workspace = None
+
+    else:
+        if pref.workspace_custom or not pref.blacklist_workspaces:
+            pass
+        else:
+            workspace = None
+
+    return workspace
+
+def render(variable):
+    pref = bpy.context.preferences.addons[__name__].preferences
+
+    render = ''
+
+    if Global.rendering:
+        #Adds a suffix to indicate that the user is rendering
+        engine = bpy.context.engine
+        
+        if engine.startswith('BLENDER_'): #Small fixup since Eevee is called "Blender_Eevee" internally
+            engine = engine.replace('BLENDER_', '').title()
+        else:
+            engine = engine.title()
+
+        if variable.replace('{render_state}', '').replace(' ', '').endswith('Rendering'):
+            if pref.display_render_engine:
+                render = " in {}".format(engine)
+        else:
+            if pref.display_render_engine:
+                render = " (Rendering in {})".format(engine)
+            else:
+                render = " (Rendering)"
+
+    return render
 
 def get_state(): #Gets current mode user is in
     pref = bpy.context.preferences.addons[__name__].preferences
@@ -228,135 +407,6 @@ def get_state(): #Gets current mode user is in
 
     return state, image
 
-def get_workspace(): #Gets workspace user is currently in
-    pref = bpy.context.preferences.addons[__name__].preferences
-
-    if pref.display_workspace == 'OP1' and len(pref.workspace_custom_text) <= 2:
-        workspace = bpy.context.workspace.name
-
-        if workspace == "Layout" or workspace == "Default":
-            if pref.workspace_default or not pref.blacklist_workspaces:
-                workspace = "General work"
-            else:
-                workspace = None
-
-        elif workspace.count("Sculpt"):
-            if pref.workspace_sculpting or not pref.blacklist_workspaces:
-                workspace = "Sculpting"
-            else:
-                workspace = None
-
-        elif workspace.count("UV"):
-            if pref.workspace_uv or not pref.blacklist_workspaces:
-
-                workspace = "UV editing"
-            else:
-                workspace = None
-
-        elif workspace.count("Texture"):
-            if pref.workspace_texture or not pref.blacklist_workspaces:
-                if workspace.count("Paint"):
-                    workspace = "Texture painting"
-                else:
-                    workspace = "Texture work"
-            else:
-                workspace = None
-        
-        elif workspace.count("Shading"):
-            if pref.workspace_shading or not pref.blacklist_workspaces:
-                workspace = "Shading"
-            else:
-                workspace = None
-
-        elif workspace.count("2D"):
-            if pref.workspace_2d or not pref.blacklist_workspaces:
-                workspace = "2D animating"
-            else:
-                workspace = None
-
-        elif workspace.count("Animation"):
-            if pref.workspace_animation or not pref.blacklist_workspaces:
-                workspace = "Animating"
-            else:
-                workspace = None
-
-        elif workspace.count("Rendering"):
-            if pref.workspace_rendering or not pref.blacklist_workspaces:
-                workspace = "Rendering"
-            else:
-                workspace = None
-
-        elif workspace.count("Compositing"):
-            if pref.workspace_compositing or not pref.blacklist_workspaces:
-                workspace = "Compositing"
-            else:
-                workspace = None
-
-        elif workspace.count("Scripting"):
-            if pref.workspace_scripting or not pref.blacklist_workspaces:
-                workspace = "Scripting"
-            else:
-                workspace = None
-
-        elif workspace.count("Motion Tracking"):
-            if pref.workspace_motiontracking or not pref.blacklist_workspaces:
-                workspace = "Motion tracking"
-            else:
-                workspace = None
-
-        elif workspace.count("Masking"):
-            if pref.workspace_masking or not pref.blacklist_workspaces:
-                workspace = "Masking"
-            else:
-                workspace = None
-
-        elif workspace.count("Video editing"):
-            if pref.workspace_video or not pref.blacklist_workspaces:
-                workspace = "Video editing"
-            else:
-                workspace = None
-
-        else:
-            if pref.workspace_custom or not pref.blacklist_workspaces:
-                pass
-            else:
-                workspace = None
-    
-        #Adds a suffix to the workspace to indicate that the user is rendering along with working
-        if Global.rendering:
-            engine = bpy.context.engine
-            if engine.startswith('BLENDER_'): #Small fixup since Eevee is called "Blender_Eevee" internally
-                engine = engine.replace('BLENDER_', '').title()
-            else:
-                engine = engine.title()
-
-            if workspace == None:
-                if pref.display_render_engine:
-                    workspace = "Rendering in {}".format(engine)
-                else:
-                    workspace = "Rendering"
-
-            elif workspace != "Rendering":
-                if pref.display_render_engine:
-                    workspace = workspace + " (Rendering in {})".format(engine)
-                else:
-                    workspace = workspace + " (Rendering)"
-            else:
-                if pref.display_render_engine:
-                    workspace = workspace + " in {}".format(engine)
-                else:
-                    pass
-
-        return workspace
-
-    elif pref.display_workspace == 'OP2' and len(pref.workspace_custom_text) >= 1:
-        workspace = pref.workspace_custom_text
-
-    elif pref.display_workspace == 'OP3':
-        workspace = None
-
-    return workspace
-
 def get_start(*args):
     global start
 
@@ -426,10 +476,10 @@ def stop_render(*args):
     Global.renderend = 0
 
 def update_presence():
-    large_text = get_version()
-    details = get_blendfile()
+    large_text = version()
+    details = blendfile()
     small_text, small_image = get_state()
-    state = get_workspace()
+    state = workspace()
     start = get_start()
 
     #Updates rich presence
@@ -444,5 +494,5 @@ def update_presence():
         small_text=small_text
         )
 
-    #print('Updated')
+    print('Updated')
     return 15
