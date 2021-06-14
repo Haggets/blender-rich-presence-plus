@@ -10,10 +10,10 @@ Another Blender Rich Presence plugin that unlike the rest, gives you total contr
 * Filter out specific workspaces (Hide every workspace except the shading workspace, for example)
 * Show the current state/mode the user is on (Object mode, Edit mode (Which includes every type of edit mode with their respective icon), sculpt mode...) or nothing at all
 * Filter out specifc states/modes (Hide every state except object mode, for example)
-* Show the current render engine being used while rendering, or keep the engine a secret and only display that you're rendering
+* Show the current render engine being used while rendering, or keep the engine a secret and only display if you're currently rendering
 * Show elapsed time since you booted up Blender, or not
 * Show elapsed time since you began a render for single frame renders (The prior time will resume itself after the render is over)
-* Show an estimate time to when your render will be finished for rendering animations (NOT 100% accurate)
+* Show an estimate time to when your render will be finished when rendering multiple frames (NOT 100% accurate)
 
 ## Examples
 
