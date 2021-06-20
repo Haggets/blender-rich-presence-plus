@@ -494,5 +494,5 @@ def update_presence():
         small_text=small_text
         )
 
-    print('Updated')
+    #print('Updated')
     return 15
