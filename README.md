@@ -5,16 +5,15 @@ Another Blender Rich Presence plugin that unlike the rest, gives you total contr
 
 ## Features
 
-* Show the version Blender is currently on, custom text or nothing at all
-* Show the name of the blend file, the full path of it, custom text or nothing at all
-* Show the current workspace the user is on, show custom text, or nothing at all
+* Show the version Blender is currently on, the current blend file name, its full path or relative folder, the size of the blend file, the current workspace, with more customizability coming by your suggestions!
+* Show all of that information wherever and in whatever position you want (Want to put just the file size on the lower row or the relative folder in the big icon hover text? Go for it), as well as custom text which can be whatever you want, before, between and/or after that information
 * Filter out specific workspaces (Hide every workspace except the shading workspace, for example)
 * Show the current state/mode the user is on (Object mode, Edit mode (Which includes every type of edit mode with their respective icon), sculpt mode...) or nothing at all
 * Filter out specifc states/modes (Hide every state except object mode, for example)
-* Show the current render engine being used while rendering (Displayed right after the workspace text), or not
+* Show the current render engine being used while rendering, or keep the engine a secret and only display if you're currently rendering
 * Show elapsed time since you booted up Blender, or not
 * Show elapsed time since you began a render for single frame renders (The prior time will resume itself after the render is over)
-* Show an estimate time to when your render will be finished for rendering animations (NOT 100% accurate)
+* Show an estimate time to when your render will be finished when rendering multiple frames (NOT 100% accurate)
 
 ## Examples
 
