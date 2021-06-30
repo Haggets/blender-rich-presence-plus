@@ -1,7 +1,7 @@
 [![discord](https://img.shields.io/discord/693987167210438656.svg?style=for-the-badge&label=Discord&logo=discord&color=7289DA&json?)](https://discord.gg/kH99XSU) [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
 # Blender Rich Presence Plus
-Another Blender Rich Presence plugin that unlike the rest, gives you total control in terms of customization, being able to freely modify what to show, and when to show it
+Another Blender Rich Presence plugin that unlike the rest, gives you total control in terms of customization, being able to freely modify what to show, and where to show it.
 
 ## Features
 
@@ -22,3 +22,6 @@ Another Blender Rich Presence plugin that unlike the rest, gives you total contr
 ![Custom text displayed instead of information](images/CustomText.png "Custom text, you're able to replace information by whatever text you want")  ![All information hidden](images/FullyHidden.png "Information customization, you're able to hide everything if you so desire") ![Approximate render estimate and current engine being used](images/RenderTime.png "Approximate render estimate, NOT 100% accurate. Also current engine used for rendering")
 
 As you can see, this plugin was made with the intention of providing as much customizability as possible in case you need or want something different, so if you want as much or as little information as possible shown about your current Blender session, this plugin will not disappoint
+
+## How to Install
+The plugin is installed like any other, you go to the Blender preferences, Addons, click on install, and select the plugin; enable it and you're good to go. The customization panel is in the same addons panel by opening the addon's panel.
