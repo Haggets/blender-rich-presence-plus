@@ -1,7 +1,6 @@
-from os import replace
 import bpy
 
-#Updater
+# Updater
 from . import addon_updater_ops
 from . import addon_updater
 
@@ -24,14 +23,19 @@ bl_info = {
     "category": "System",
 }
 
+
 def register():
-    
-    #Registers addon updater
+
+    # Registers addon updater
     addon_updater_ops.register(bl_info)
 
     bpy.utils.register_class(preferences.BRCP_preferences)
 
-    RPC.connect() # Start the handshake loop
+    try:
+        RPC.connect()  # Start the handshake loop
+    except:
+        Global.discordopen = False
+        print("Couldn't connect, retrying...")
 
     bpy.app.timers.register(update_presence, first_interval=1.0, persistent=True)
     bpy.app.handlers.render_init.append(start_render)
@@ -39,14 +43,16 @@ def register():
     bpy.app.handlers.render_cancel.append(stop_render)
     bpy.app.handlers.render_post.append(during_render)
 
+
 def unregister():
-    
+
     addon_updater_ops.unregister()
 
     bpy.utils.unregister_class(preferences.BRCP_preferences)
 
-    RPC.clear() #Clears the Rich Presence before closing
-    RPC.close()
+    if Global.discordopen:
+        RPC.clear()  # Clears the Rich Presence before closing
+        RPC.close()
 
     bpy.app.timers.unregister(update_presence)
     bpy.app.handlers.render_init.remove(start_render)
@@ -54,13 +60,14 @@ def unregister():
     bpy.app.handlers.render_cancel.remove(stop_render)
     bpy.app.handlers.render_post.remove(during_render)
 
-#Bot ID
+
+# Bot ID
 client_id = '823368505465896960'
 
-#Initializes Rich Presence
-RPC = rpc.Presence(client_id)  # Initialize the client class
+# Initializes Rich Presence
+RPC = rpc.Presence(client_id)
 
-#Rich Presence variables
+# Rich Presence variables
 state = ''
 details = ''
 start = datetime.now().timestamp()
@@ -69,7 +76,9 @@ large_text = ''
 small_image = ''
 small_text = ''
 
-#Other variables
+# Other variables
+
+
 class Global():
     rendering = False
     renderstart = 0
@@ -83,8 +92,12 @@ class Global():
     estimated2 = 0
     reference = False
 
+    discordopen = False
+
+
 if __name__ == "__main__":
     register()
+
 
 def change_keystring(variable, key, replacement):
     if not replacement:
@@ -99,8 +112,9 @@ def change_keystring(variable, key, replacement):
 
     if variable.count(key):
         variable = variable.replace(key, replacement)
-    
+
     return variable
+
 
 def change_all_keystrings(variable):
     variable = change_keystring(variable, '{file_name}', bpy.path.display_name(bpy.data.filepath))
@@ -115,14 +129,15 @@ def change_all_keystrings(variable):
             size = str(int(getsize(bpy.data.filepath)/1000)) + 'KB'
         else:
             size = str(int(getsize(bpy.data.filepath)/1000000)) + 'MB'
-    
+
         variable = change_keystring(variable, '{file_size}', size)
     else:
         variable = change_keystring(variable, '{file_size}', 'Unknown File Size')
 
     return variable
 
-def version(): #Gets currently used version of Blender
+
+def version():  # Gets currently used version of Blender
     pref = bpy.context.preferences.addons[__name__].preferences
 
     if pref.version_text:
@@ -137,7 +152,8 @@ def version(): #Gets currently used version of Blender
 
     return version
 
-def blendfile(): #Gets file name or full file path the user is currently on
+
+def blendfile():  # Gets file name or full file path the user is currently on
     pref = bpy.context.preferences.addons[__name__].preferences
 
     blendfile = ''
@@ -147,19 +163,20 @@ def blendfile(): #Gets file name or full file path the user is currently on
 
         blendfile = change_all_keystrings(blendfile)
 
-        #Removes the .blend when the scene is now, since it looks weird with it
+        # Removes the .blend when the scene is now, since it looks weird with it
         if blendfile.count('New File') or blendfile.count('No Folder') or blendfile.count('No Directory'):
             blendfile = blendfile.replace('.blend', '')
     else:
         blendfile = None
 
-    #Adds filler spaces to allow for the string to be shorter than 3 letters
+    # Adds filler spaces to allow for the string to be shorter than 3 letters
     if blendfile and len(blendfile) <= 3:
         blendfile = blendfile + '   '
 
     return blendfile
 
-def workspace(): #Gets workspace user is currently in
+
+def workspace():  # Gets workspace user is currently in
     pref = bpy.context.preferences.addons[__name__].preferences
 
     if pref.workspace_text:
@@ -173,6 +190,7 @@ def workspace(): #Gets workspace user is currently in
         workspace = workspace + ' '
 
     return workspace
+
 
 def get_workspace():
     pref = bpy.context.preferences.addons[__name__].preferences
@@ -206,7 +224,7 @@ def get_workspace():
                 workspace = "Texture work"
         else:
             workspace = None
-    
+
     elif workspace.count("Shading"):
         if pref.workspace_shading or not pref.blacklist_workspaces:
             workspace = "Shading"
@@ -275,16 +293,17 @@ def get_workspace():
 
     return workspace
 
+
 def render(variable):
     pref = bpy.context.preferences.addons[__name__].preferences
 
     render = ''
 
     if Global.rendering:
-        #Adds a suffix to indicate that the user is rendering
+        # Adds a suffix to indicate that the user is rendering
         engine = bpy.context.engine
-        
-        if engine.startswith('BLENDER_'): #Small fixup since Eevee is called "Blender_Eevee" internally
+
+        if engine.startswith('BLENDER_'):  # Small fixup since Eevee is called "Blender_Eevee" internally
             engine = engine.replace('BLENDER_', '').title()
         else:
             engine = engine.title()
@@ -300,13 +319,14 @@ def render(variable):
 
     return render
 
-def get_state(): #Gets current mode user is in
+
+def get_state():  # Gets current mode user is in
     pref = bpy.context.preferences.addons[__name__].preferences
 
     if pref.display_state:
         state = bpy.context.mode
         image = ''
-        
+
         if state == 'OBJECT':
             if pref.state_object or not pref.blacklist_states:
                 state = "Object mode"
@@ -382,7 +402,7 @@ def get_state(): #Gets current mode user is in
             else:
                 state = None
                 image = None
-        
+
         elif state.count('VERTEX'):
             if pref.state_vertexpaint or not pref.blacklist_states:
                 if state == 'PAINT_VERTEX':
@@ -407,6 +427,7 @@ def get_state(): #Gets current mode user is in
 
     return state, image
 
+
 def get_start(*args):
     global start
 
@@ -419,53 +440,59 @@ def get_start(*args):
 
     return time
 
+
 @persistent
 def start_render(*args):
     Global.rendering = True
     Global.paststartframe = False
     Global.renderstart = datetime.now()
 
+
 @persistent
-def during_render(*args):    
+def during_render(*args):
     pref = bpy.context.preferences.addons[__name__].preferences
 
-    #Get total frame count
+    # Get total frame count
     endframe = bpy.context.scene.frame_end
 
-    #If disabled, the time left will not be shown
+    # If disabled, the time left will not be shown
     if pref.display_render_time:
         Global.paststartframe = True
-    
-    #If there is no reference time and the current frame is a reference frame
+
+    # If there is no reference time and the current frame is a reference frame
     if Global.reference:
-        Global.referencetime = datetime.now() #Get time after end of reference frame
+        Global.referencetime = datetime.now()  # Get time after end of reference frame
 
-    #If there is no post reference time and the current frame is not a reference frame
+    # If there is no post reference time and the current frame is not a reference frame
     elif not Global.reference:
-        Global.postreferencetime = datetime.now() #Time taken to render relative to the reference frame
+        Global.postreferencetime = datetime.now()  # Time taken to render relative to the reference frame
 
-    #Only on the first frame, gets rough time estimate
+    # Only on the first frame, gets rough time estimate
     if not Global.renderend:
-        Global.estimated1 = Global.postreferencetime - Global.renderstart #Gets render time from subtracting first frame time spent by initial render time
-        Global.renderend = Global.estimated1 * endframe #Multiplies rendered time by total amount of frames
-        Global.renderend = Global.renderstart + Global.renderend #Sums the estimated time to the initial render time
-    else: #After first frame
+        # Gets render time from subtracting first frame time spent by initial render time
+        Global.estimated1 = Global.postreferencetime - Global.renderstart
+        Global.renderend = Global.estimated1 * endframe  # Multiplies rendered time by total amount of frames
+        Global.renderend = Global.renderstart + Global.renderend  # Sums the estimated time to the initial render time
+    else:  # After first frame
         if not Global.reference:
-            Global.estimated2 = Global.postreferencetime - Global.referencetime #Gets rendered time from subtracting current frame time spent by reference frame time
-            Global.estimated1 = (Global.estimated1+Global.estimated2)/2 #Sums both estimates and then divides them, averaging out the estimate
-            Global.renderend = Global.estimated1 * endframe #Multiplies averaged estimate by total amount of frames
+            # Gets rendered time from subtracting current frame time spent by reference frame time
+            Global.estimated2 = Global.postreferencetime - Global.referencetime
+            # Sums both estimates and then divides them, averaging out the estimate
+            Global.estimated1 = (Global.estimated1+Global.estimated2)/2
+            Global.renderend = Global.estimated1 * endframe  # Multiplies averaged estimate by total amount of frames
 
-            Global.renderend = Global.renderstart + Global.renderend #Sums averaged estimated time to the intial render time
-        
+            Global.renderend = Global.renderstart + Global.renderend  # Sums averaged estimated time to the intial render time
+
     if Global.reference:
         Global.reference = False
     elif not Global.reference:
         Global.reference = True
-        
+
     #print(Global.renderstart, Global.renderend)
-    #print(Global.estimated1)
-    #print(Global.estimated2)
+    # print(Global.estimated1)
+    # print(Global.estimated2)
     #print('render:', Global.renderend)
+
 
 @persistent
 def stop_render(*args):
@@ -475,6 +502,7 @@ def stop_render(*args):
     Global.reference = False
     Global.renderend = 0
 
+
 def update_presence():
     large_text = version()
     details = blendfile()
@@ -482,17 +510,27 @@ def update_presence():
     state = workspace()
     start = get_start()
 
-    #Updates rich presence
-    RPC.update(
-        state=state,
-        details=details,
-        start=start if not Global.rendering else Global.renderstart.timestamp(),
-        end=None if not Global.paststartframe else Global.renderend.timestamp(),
-        large_image=large_image,
-        large_text=large_text,
-        small_image=small_image,
-        small_text=small_text
-        )
+    if not Global.discordopen:
+        try:
+            RPC.connect()  # Start the handshake loop
+            Global.discordopen = True
+        except:
+            print("Couldn't connect, retrying...")
+    else:
+        try:
+            # Updates rich presence
+            RPC.update(
+                state=state,
+                details=details,
+                start=start if not Global.rendering else Global.renderstart.timestamp(),
+                end=None if not Global.paststartframe else Global.renderend.timestamp(),
+                large_image=large_image,
+                large_text=large_text,
+                small_image=small_image,
+                small_text=small_text
+            )
+        except:
+            pass
 
-    #print('Updated')
+    # print('Updated')
     return 15
