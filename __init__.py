@@ -93,6 +93,7 @@ class Global():
     reference = False
 
     discordopen = False
+    retries = 0
 
 
 if __name__ == "__main__":
@@ -514,8 +515,16 @@ def update_presence():
         try:
             RPC.connect()  # Start the handshake loop
             Global.discordopen = True
+            Global.retries = 0
         except:
-            print("Couldn't connect, retrying...")
+            if Global.retries == 5:
+                print("5 failed attempts, disabling logging...")
+                Global.retries += 1
+            elif Global.retries < 5:
+                print("Couldn't connect, retrying...")
+                Global.retries += 1
+            else:
+                pass
     else:
         try:
             # Updates rich presence
