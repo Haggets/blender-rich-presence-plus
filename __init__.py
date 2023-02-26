@@ -14,7 +14,7 @@ from os.path import getsize
 bl_info = {
     "name": "Blender Rich Presence Plus",
     "author": "Haggets",
-    "version": (1, 2, 0),
+    "version": (1, 2, 1),
     "blender": (2, 83, 0),
     "description": "Fully customizable Discord Rich Presence for Blender",
     "url": "https://github.com/Haggets/blender-rich-presence-plus",
@@ -118,7 +118,8 @@ def change_keystring(variable, key, replacement):
 
 
 def change_all_keystrings(variable):
-    variable = change_keystring(variable, '{file_name}', bpy.path.display_name(bpy.data.filepath))
+    pref = bpy.context.preferences.addons[__name__].preferences
+
     variable = change_keystring(variable, '{folder_name}', bpy.data.filepath.split('\\')[len(bpy.data.filepath.split('\\'))-2])
     variable = change_keystring(variable, '{full_path}', bpy.data.filepath)
     variable = change_keystring(variable, '{blender_version}', bpy.app.version_string)
@@ -132,6 +133,30 @@ def change_all_keystrings(variable):
             size = str(int(getsize(bpy.data.filepath)/1000000)) + 'MB'
 
         variable = change_keystring(variable, '{file_size}', size)
+
+        if pref.add_space_on_capital_letters:
+            upperlist = []
+            name = bpy.path.display_name(bpy.data.filepath)
+            for c in name:
+                if c.isupper():
+                    upperlist.append(c)
+
+            for c in upperlist:
+                idx = name.find(c)
+                prioridx = idx - 1
+                if prioridx == -1:
+                    continue
+
+                if name[idx - 1].isupper():
+                    continue
+
+                name = name.replace(c, " " + c)
+
+            name = name.strip()
+
+            variable = change_keystring(variable, '{file_name}', name)
+        else:
+            variable = change_keystring(variable, '{file_name}', bpy.path.display_name(bpy.data.filepath))
     else:
         variable = change_keystring(variable, '{file_size}', 'Unknown File Size')
 
