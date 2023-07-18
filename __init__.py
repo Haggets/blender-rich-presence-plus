@@ -158,6 +158,7 @@ def change_all_keystrings(variable):
         else:
             variable = change_keystring(variable, '{file_name}', bpy.path.display_name(bpy.data.filepath))
     else:
+        variable = change_keystring(variable, '{file_name}', bpy.path.display_name(bpy.data.filepath))
         variable = change_keystring(variable, '{file_size}', 'Unknown File Size')
 
     return variable
