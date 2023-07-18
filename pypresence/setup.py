@@ -1,4 +1,5 @@
 from setuptools import setup
+import pypresence
 
 # Use README for the PyPI page
 with open('README.md') as f:
@@ -8,9 +9,9 @@ with open('README.md') as f:
 setup(name='pypresence',
       author='qwertyquerty',
       url='https://github.com/qwertyquerty/pypresence',
-      version='4.2.0',
+      version=pypresence.__version__,
       packages=['pypresence'],
-      python_requires='>=3.5',
+      python_requires='>=3.8',
       platforms=['Windows', 'Linux', 'OSX'],
       zip_safe=True,
       license='MIT',
@@ -31,9 +32,11 @@ setup(name='pypresence',
             'Operating System :: MacOS :: MacOS X',
 
             'Programming Language :: Python',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
+
             'Programming Language :: Python :: 3 :: Only',
             'Programming Language :: Python :: Implementation :: CPython',
 
@@ -45,7 +48,7 @@ setup(name='pypresence',
       ]
 )
 
-print("""
+print(r"""
 ___  _   _ ___  ____ ____ ____ ____ _  _ ____ ____
 |__]  \_/  |__] |__/ |___ [__  |___ |\ | |    |___
 |      |   |    |  \ |___ ___] |___ | \| |___ |___
