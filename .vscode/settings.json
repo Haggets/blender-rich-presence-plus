@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "pypresence": true,
+    "__pycache__": true,
+    ".vscode": true
+  }
+}
