@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presence() &#8212; pypresence 3.2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Client()" href="client.html" />
+    <link rel="prev" title="Examples" href="../info/examples.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="presence">
+<h1>Presence()<a class="headerlink" href="#presence" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="Presence">
+<em class="property">class </em><code class="sig-name descname">Presence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client_id</span></em>, <em class="sig-param"><span class="n">pipe</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">loop</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">handler</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Presence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Presence client ready for usage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client_id</strong> (<em>str</em>) – OAuth2 App ID (found <a class="reference external" href="https://discord.com/developers/applications/me">here</a>)</p></li>
+<li><p><strong>pipe</strong> (<em>int</em>) – Pipe that should be used to connect to the Discord client. Defaults to 0, can be 0-9</p></li>
+<li><p><strong>loop</strong> (<em>asyncio.BaseEventLoop</em>) – Your own event loop (if you have one) that PyPresence should use. One will be created if not supplied. Information at <a class="reference external" href="https://docs.python.org/3/library/asyncio-eventloop.html">https://docs.python.org/3/library/asyncio-eventloop.html</a></p></li>
+<li><p><strong>handler</strong> (<em>function</em>) – The exception handler pypresence should send asynchronous errors to. This can be a coroutine or standard function as long as it takes two arguments (exception, future). Exception will be the exception to handle and future will be an instance of asyncio.Future</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p><br /></p>
+<blockquote>
+<div><dl class="py function">
+<dt id="connect">
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the connection - must be done in order to make any updates to Rich Presence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><br /></p>
+<dl class="py function">
+<dt id="clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pid</span><span class="o">=</span><span class="default_value">os.getpid()</span></em><span class="sig-paren">)</span><a class="headerlink" href="#clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears the presence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pid</strong> (<em>int</em>) – the process id of your game</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><br /></p>
+<dl class="py function">
+<dt id="close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><br /></p>
+<dl class="py function">
+<dt id="update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the user’s presence on Discord.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pid</strong> (<em>int</em>) – the process id of your game</p></li>
+<li><p><strong>state</strong> (<em>str</em>) – the user’s current status</p></li>
+<li><p><strong>details</strong> (<em>str</em>) – what the player is currently doing</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – epoch time for game start</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – epoch time for game end</p></li>
+<li><p><strong>large_image</strong> (<em>str</em>) – name of the uploaded image for the large profile artwork</p></li>
+<li><p><strong>large_text</strong> (<em>str</em>) – tooltip for the large image</p></li>
+<li><p><strong>small_image</strong> (<em>str</em>) – name of the uploaded image for the small profile artwork</p></li>
+<li><p><strong>small_text</strong> (<em>str</em>) – tootltip for the small image</p></li>
+<li><p><strong>party_id</strong> (<em>str</em>) – id of the player’s party, lobby, or group</p></li>
+<li><p><strong>party_size</strong> (<em>list</em>) – current size of the player’s party, lobby, or group, and the max in this format: <code class="docutils literal notranslate"><span class="pre">[1,4]</span></code></p></li>
+<li><p><strong>join</strong> (<em>str</em>) – unique hashed string for chat invitations and ask to join</p></li>
+<li><p><strong>spectate</strong> (<em>str</em>) – unique hashed string for spectate button</p></li>
+<li><p><strong>match</strong> (<em>str</em>) – unique hashed string for spectate and join</p></li>
+<li><p><strong>buttons</strong> (<em>list</em>) – list of dicts for buttons on your profile in the format <code class="docutils literal notranslate"><span class="pre">[{&quot;label&quot;:</span> <span class="pre">&quot;My</span> <span class="pre">Website&quot;,</span> <span class="pre">&quot;url&quot;:</span> <span class="pre">&quot;https://qtqt.cf&quot;},</span> <span class="pre">...]</span></code>, can list up to two buttons</p></li>
+<li><p><strong>instance</strong> (<em>bool</em>) – marks the match as a game session with a specific beginning and end</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><br /></p>
+</div></blockquote>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/./logosmall.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../info/about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../info/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../info/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../info/examples.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Presence()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client()</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../info/examples.html" title="previous chapter">Examples</a></li>
+      <li>Next: <a href="client.html" title="next chapter">Client()</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, qwertyquerty.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/presence.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
