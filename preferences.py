@@ -1,335 +1,395 @@
 import bpy
-from . import addon_updater_ops
+from bpy.props import BoolProperty, StringProperty
 
 
-@addon_updater_ops.make_annotations
 class BRCP_preferences(bpy.types.AddonPreferences):
-    """Blender Rich Presence Plus preferences/updater"""
+    """Blender Rich Presence Plus preferences"""
+
     bl_idname = __package__
 
-    # Updater preferences
-    auto_check_update: bpy.props.BoolProperty(
-        name="Auto-check for Update",
-        description="If enabled, auto-check for updates using an interval",
-        default=True)
-
-    updater_interval_months: bpy.props.IntProperty(
-        name='Months',
-        description="Number of months between checking for updates",
-        default=0,
-        min=0)
-
-    updater_interval_days: bpy.props.IntProperty(
-        name='Days',
-        description="Number of days between checking for updates",
-        default=7,
-        min=0,
-        max=31)
-
-    updater_interval_hours: bpy.props.IntProperty(
-        name='Hours',
-        description="Number of hours between checking for updates",
-        default=0,
-        min=0,
-        max=23)
-
-    updater_interval_minutes: bpy.props.IntProperty(
-        name='Minutes',
-        description="Number of minutes between checking for updates",
-        default=0,
-        min=0,
-        max=59)
-
     # Version
-    text_category: bpy.props.BoolProperty(
+    text_category: BoolProperty(
         name="Text category",
         description="Options where you can modify everything it'll display",
-        default=False
+        default=False,
     )
 
-    version_text: bpy.props.StringProperty(
+    version_text: StringProperty(
         name="Version text (When hovering on big icon)",
         description="Replace displayed version by custom text",
-        default='Version {blender_version}'
+        default="Version {blender_version}",
     )
 
-    blendfile_text: bpy.props.StringProperty(
+    blendfile_text: StringProperty(
         name="Upper row",
         description="Replace file name by custom text",
-        default='{file_name}.blend'
+        default="{file_name}.blend",
     )
 
-    workspace_text: bpy.props.StringProperty(
+    workspace_text: StringProperty(
         name="Lower row",
         description="Replace workspace by custom text",
-        default='{workspace} {render_state}'
+        default="{workspace} {render_state}",
     )
 
     # Whitelisted workspaces
-    blacklist_workspaces: bpy.props.BoolProperty(
+    blacklist_workspaces: BoolProperty(
         name="Hide workspaces except:",
         description="Blacklists unselected workspaces",
-        default=False
+        default=False,
     )
 
-    workspace_default: bpy.props.BoolProperty(
+    workspace_default: BoolProperty(
         name="Default workspace",
         description="Workspace you begin in by default",
-        default=True
+        default=True,
     )
 
-    workspace_sculpting: bpy.props.BoolProperty(
+    workspace_sculpting: BoolProperty(
         name="Sculpting workspace",
         description="Workspace for mesh sculpt",
-        default=True
+        default=True,
     )
 
-    workspace_uv: bpy.props.BoolProperty(
-        name="UV workspaces",
-        description="Workspaces for mesh UV editing",
-        default=True
+    workspace_uv: BoolProperty(
+        name="UV workspaces", description="Workspaces for mesh UV editing", default=True
     )
 
-    workspace_texture: bpy.props.BoolProperty(
+    workspace_texture: BoolProperty(
         name="Texture workspaces",
         description="Workspaces for texture editing",
-        default=True
+        default=True,
     )
 
-    workspace_shading: bpy.props.BoolProperty(
+    workspace_shading: BoolProperty(
         name="Shading workspace",
         description="Workspace for object shading",
-        default=True
+        default=True,
     )
 
-    workspace_animation: bpy.props.BoolProperty(
-        name="Animation workspace",
-        description="Workspace for animation",
-        default=True
+    workspace_animation: BoolProperty(
+        name="Animation workspace", description="Workspace for animation", default=True
     )
 
-    workspace_rendering: bpy.props.BoolProperty(
+    workspace_rendering: BoolProperty(
         name="Rendering workspace",
         description="Workspace for scene rendering",
-        default=True
+        default=True,
     )
 
-    workspace_compositing: bpy.props.BoolProperty(
+    workspace_compositing: BoolProperty(
         name="Compositing workspace",
         description="Workspace for scene composition",
-        default=True
+        default=True,
     )
 
-    workspace_scripting: bpy.props.BoolProperty(
+    workspace_scripting: BoolProperty(
         name="Scripting workspace",
         description="Workspace for Python related scripting",
-        default=True
+        default=True,
     )
 
-    workspace_geometry_nodes: bpy.props.BoolProperty(
+    workspace_geometry_nodes: BoolProperty(
         name="Geometry nodes workspace",
         description="Workspace for Geometry node work",
-        default=True
+        default=True,
     )
 
-    workspace_2d: bpy.props.BoolProperty(
+    workspace_2d: BoolProperty(
         name="2D related workspaces",
         description="Workspaces for 2D related work",
-        default=True
+        default=True,
     )
 
-    workspace_motiontracking: bpy.props.BoolProperty(
+    workspace_motiontracking: BoolProperty(
         name="Motion tracking workspace",
         description="Workspace related to VFX motion tracking",
-        default=True
+        default=True,
     )
 
-    workspace_masking: bpy.props.BoolProperty(
+    workspace_masking: BoolProperty(
         name="Masking workspace",
         description="Worksapce related to VFX masking",
-        default=True
+        default=True,
     )
 
-    workspace_video: bpy.props.BoolProperty(
+    workspace_video: BoolProperty(
         name="Video editing workspace",
         description="Workspace related to editing videos",
-        default=True
+        default=True,
     )
 
-    workspace_custom: bpy.props.BoolProperty(
+    workspace_custom: BoolProperty(
         name="Custom workspaces",
         description="Any other workspace that isn't the Blender default",
-        default=True
+        default=True,
     )
 
-    display_state: bpy.props.BoolProperty(
+    display_state: BoolProperty(
         name="Show user state",
         description="Displays the user state as the small image in the Rich Presence",
-        default=True
+        default=True,
     )
 
     # Blacklisted states
-    blacklist_states: bpy.props.BoolProperty(
+    blacklist_states: BoolProperty(
         name="Hide state except:",
         description="Blacklists unselected states",
-        default=False
+        default=False,
     )
 
-    state_object: bpy.props.BoolProperty(
-        name="Object mode",
-        default=True
-    )
+    state_object: BoolProperty(name="Object mode", default=True)
 
-    state_edit: bpy.props.BoolProperty(
-        name="Edit mode",
-        default=True
-    )
+    state_edit: BoolProperty(name="Edit mode", default=True)
 
-    state_sculpt: bpy.props.BoolProperty(
-        name="Sculpt mode",
-        default=True
-    )
+    state_sculpt: BoolProperty(name="Sculpt mode", default=True)
 
-    state_pose: bpy.props.BoolProperty(
-        name="Pose mode",
-        default=True
-    )
+    state_pose: BoolProperty(name="Pose mode", default=True)
 
-    state_weightpaint: bpy.props.BoolProperty(
-        name="Weight paint",
-        default=True
-    )
+    state_weightpaint: BoolProperty(name="Weight paint", default=True)
 
-    state_texturepaint: bpy.props.BoolProperty(
-        name="Texture paint",
-        default=True
-    )
+    state_texturepaint: BoolProperty(name="Texture paint", default=True)
 
-    state_vertexpaint: bpy.props.BoolProperty(
-        name="Vertex paint",
-        default=True
-    )
+    state_vertexpaint: BoolProperty(name="Vertex paint", default=True)
 
-    state_pencil: bpy.props.BoolProperty(
-        name="Grease pencil paint",
-        default=True
-    )
+    state_pencil: BoolProperty(name="Grease pencil paint", default=True)
 
-    others_category: bpy.props.BoolProperty(
+    others_category: BoolProperty(
         name="Others category",
         description="Options for other categories that arent's so important",
-        default=False
+        default=False,
     )
 
     # Name
-    add_space_on_capital_letters: bpy.props.BoolProperty(
-        name="Add spaces before capital letters",
-        default=False
+    add_space_on_capital_letters: BoolProperty(
+        name="Add spaces before capital letters", default=False
     )
 
     # Render
-    display_render_engine: bpy.props.BoolProperty(
-        name="Show render engine",
-        default=True
-    )
+    display_render_engine: BoolProperty(name="Show render engine", default=True)
 
     # Time
-    display_time: bpy.props.BoolProperty(
-        name="Show elapsed time",
-        default=True
-    )
+    display_time: BoolProperty(name="Show elapsed time", default=True)
 
-    display_render_time: bpy.props.BoolProperty(
-        name="Show approximate render end time",
-        default=True
+    display_render_time: BoolProperty(
+        name="Show approximate render end time", default=True
     )
 
     def draw(self, context):
         layout = self.layout
-        settings = addon_updater_ops.get_user_preferences(context)
 
-        box = layout.box()
-        box.label(text="Using the following key strings will replace them for their description")
-        box.label(text="{file_name} = Current Blend file name")
-        box.label(text="{folder_name} = Blend file's Folder name")
-        box.label(text="{full_path} = Full Blend file directory")
-        box.label(text="{workspace} = Current workspace")
-        box.label(text="{blender_version} = Current Blender version")
-        box.label(text="{file_size} = Current blend file size")
-        box.label(text="{render_state} = Render state (And which engine if activated) only when rendering")
+        help_box = layout.box()
+        help_box.label(
+            text="Using the following key strings will replace them for their description"
+        )
+        help_box.label(text=r"{file_name} = Current Blend file name")
+        help_box.label(text=r"{folder_name} = Blend file's Folder name")
+        help_box.label(text=r"{full_path} = Full Blend file directory")
+        help_box.label(text=r"{workspace} = Current workspace")
+        help_box.label(text=r"{blender_version} = Current Blender version")
+        help_box.label(text=r"{file_size} = Current blend file size")
+        help_box.label(
+            text=r"{render_state} = Render state (And which engine if activated) only when rendering"
+        )
 
         col = layout.row()
-        col.prop(self, 'text_category', emboss=False, icon='DISCLOSURE_TRI_DOWN' if self.text_category else 'DISCLOSURE_TRI_RIGHT')
+        col.prop(
+            self,
+            "text_category",
+            emboss=False,
+            icon=(
+                "DISCLOSURE_TRI_DOWN" if self.text_category else "DISCLOSURE_TRI_RIGHT"
+            ),
+        )
 
         # Version
         if self.text_category:
             row = layout.row()
-            row.prop(self, 'version_text')
+            row.prop(self, "version_text")
 
             # Blend file
             col = layout.column()
-            col.prop(self, 'blendfile_text')
+            col.prop(self, "blendfile_text")
 
             # Workspace
-            col.prop(self, 'workspace_text')
+            col.prop(self, "workspace_text")
 
             col = layout.column()
-            col.prop(self, 'blacklist_workspaces')
+            col.prop(self, "blacklist_workspaces")
 
             if self.blacklist_workspaces:
                 row = layout.row()
-                row.prop(self, 'workspace_default', icon='CHECKBOX_HLT' if self.workspace_default else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_sculpting', icon='CHECKBOX_HLT' if self.workspace_sculpting else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_uv', icon='CHECKBOX_HLT' if self.workspace_uv else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "workspace_default",
+                    icon="CHECKBOX_HLT" if self.workspace_default else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "workspace_sculpting",
+                    icon=(
+                        "CHECKBOX_HLT" if self.workspace_sculpting else "CHECKBOX_DEHLT"
+                    ),
+                )
+                row.prop(
+                    self,
+                    "workspace_uv",
+                    icon="CHECKBOX_HLT" if self.workspace_uv else "CHECKBOX_DEHLT",
+                )
                 row = layout.row()
-                row.prop(self, 'workspace_texture', icon='CHECKBOX_HLT' if self.workspace_texture else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_shading', icon='CHECKBOX_HLT' if self.workspace_shading else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_animation', icon='CHECKBOX_HLT' if self.workspace_animation else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "workspace_texture",
+                    icon="CHECKBOX_HLT" if self.workspace_texture else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "workspace_shading",
+                    icon="CHECKBOX_HLT" if self.workspace_shading else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "workspace_animation",
+                    icon=(
+                        "CHECKBOX_HLT" if self.workspace_animation else "CHECKBOX_DEHLT"
+                    ),
+                )
                 row = layout.row()
-                row.prop(self, 'workspace_rendering', icon='CHECKBOX_HLT' if self.workspace_rendering else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_compositing', icon='CHECKBOX_HLT' if self.workspace_compositing else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_geometry_nodes', icon='CHECKBOX_HLT' if self.workspace_compositing else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "workspace_rendering",
+                    icon=(
+                        "CHECKBOX_HLT" if self.workspace_rendering else "CHECKBOX_DEHLT"
+                    ),
+                )
+                row.prop(
+                    self,
+                    "workspace_compositing",
+                    icon=(
+                        "CHECKBOX_HLT"
+                        if self.workspace_compositing
+                        else "CHECKBOX_DEHLT"
+                    ),
+                )
+                row.prop(
+                    self,
+                    "workspace_geometry_nodes",
+                    icon=(
+                        "CHECKBOX_HLT"
+                        if self.workspace_compositing
+                        else "CHECKBOX_DEHLT"
+                    ),
+                )
                 row = layout.row()
-                row.prop(self, 'workspace_scripting', icon='CHECKBOX_HLT' if self.workspace_scripting else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_2d', icon='CHECKBOX_HLT' if self.workspace_2d else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_motiontracking', icon='CHECKBOX_HLT' if self.workspace_motiontracking else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "workspace_scripting",
+                    icon=(
+                        "CHECKBOX_HLT" if self.workspace_scripting else "CHECKBOX_DEHLT"
+                    ),
+                )
+                row.prop(
+                    self,
+                    "workspace_2d",
+                    icon="CHECKBOX_HLT" if self.workspace_2d else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "workspace_motiontracking",
+                    icon=(
+                        "CHECKBOX_HLT"
+                        if self.workspace_motiontracking
+                        else "CHECKBOX_DEHLT"
+                    ),
+                )
                 row = layout.row()
-                row.prop(self, 'workspace_masking', icon='CHECKBOX_HLT' if self.workspace_masking else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_video', icon='CHECKBOX_HLT' if self.workspace_video else 'CHECKBOX_DEHLT')
-                row.prop(self, 'workspace_custom', icon='CHECKBOX_HLT' if self.workspace_custom else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "workspace_masking",
+                    icon="CHECKBOX_HLT" if self.workspace_masking else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "workspace_video",
+                    icon="CHECKBOX_HLT" if self.workspace_video else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "workspace_custom",
+                    icon="CHECKBOX_HLT" if self.workspace_custom else "CHECKBOX_DEHLT",
+                )
 
         row = layout.row()
-        row.prop(self, 'others_category', emboss=False, icon='DISCLOSURE_TRI_DOWN' if self.others_category else 'DISCLOSURE_TRI_RIGHT')
+        row.prop(
+            self,
+            "others_category",
+            emboss=False,
+            icon=(
+                "DISCLOSURE_TRI_DOWN"
+                if self.others_category
+                else "DISCLOSURE_TRI_RIGHT"
+            ),
+        )
 
         if self.others_category:
             # State
             row = layout.row()
-            row.prop(self, 'display_state')
-            row.prop(self, 'display_render_engine')
+            row.prop(self, "display_state")
+            row.prop(self, "display_render_engine")
 
             row = layout.row()
-            row.prop(self, 'display_time')
-            row.prop(self, 'display_render_time')
+            row.prop(self, "display_time")
+            row.prop(self, "display_render_time")
 
             row = layout.row()
-            row.prop(self, 'add_space_on_capital_letters')
+            row.prop(self, "add_space_on_capital_letters")
 
             col = layout.column()
-            col.prop(self, 'blacklist_states')
+            col.prop(self, "blacklist_states")
 
             if self.blacklist_states:
                 row = layout.row()
-                row.prop(self, 'state_object', icon='CHECKBOX_HLT' if self.state_object else 'CHECKBOX_DEHLT')
-                row.prop(self, 'state_edit', icon='CHECKBOX_HLT' if self.state_edit else 'CHECKBOX_DEHLT')
-                row.prop(self, 'state_sculpt', icon='CHECKBOX_HLT' if self.state_sculpt else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "state_object",
+                    icon="CHECKBOX_HLT" if self.state_object else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "state_edit",
+                    icon="CHECKBOX_HLT" if self.state_edit else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "state_sculpt",
+                    icon="CHECKBOX_HLT" if self.state_sculpt else "CHECKBOX_DEHLT",
+                )
                 row = layout.row()
-                row.prop(self, 'state_pose', icon='CHECKBOX_HLT' if self.state_pose else 'CHECKBOX_DEHLT')
-                row.prop(self, 'state_weightpaint', icon='CHECKBOX_HLT' if self.state_weightpaint else 'CHECKBOX_DEHLT')
-                row.prop(self, 'state_texturepaint', icon='CHECKBOX_HLT' if self.state_texturepaint else 'CHECKBOX_DEHLT')
+                row.prop(
+                    self,
+                    "state_pose",
+                    icon="CHECKBOX_HLT" if self.state_pose else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "state_weightpaint",
+                    icon="CHECKBOX_HLT" if self.state_weightpaint else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "state_texturepaint",
+                    icon=(
+                        "CHECKBOX_HLT" if self.state_texturepaint else "CHECKBOX_DEHLT"
+                    ),
+                )
                 row = layout.row()
-                row.prop(self, 'state_vertexpaint', icon='CHECKBOX_HLT' if self.state_vertexpaint else 'CHECKBOX_DEHLT')
-                row.prop(self, 'state_pencil', icon='CHECKBOX_HLT' if self.state_pencil else 'CHECKBOX_DEHLT')
-
-        col = layout.column()
-
-        addon_updater_ops.update_settings_ui(self, context)
+                row.prop(
+                    self,
+                    "state_vertexpaint",
+                    icon="CHECKBOX_HLT" if self.state_vertexpaint else "CHECKBOX_DEHLT",
+                )
+                row.prop(
+                    self,
+                    "state_pencil",
+                    icon="CHECKBOX_HLT" if self.state_pencil else "CHECKBOX_DEHLT",
+                )
